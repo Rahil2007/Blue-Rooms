@@ -1,3 +1,4 @@
+// This is a test
 var player, playerImg, playerHurtImg, playerCollectImg;
 var enemy1,enemy2 ,enemy3 ,enemy4 ,enemy5 ,enemyAnimation;
 var coin,coinImg;
