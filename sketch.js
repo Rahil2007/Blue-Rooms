@@ -1,5 +1,4 @@
-// This is a test
-var player, playerImg, playerHurtImg, playerCollectImg;
+var player, playerImg, playerHurtImg, playerCollectImg, playerInvincibleImg;
 var enemy1,enemy2 ,enemy3 ,enemy4 ,enemy5 ,enemyAnimation;
 var coin,coinImg;
 var gun, gunImg;
@@ -19,6 +18,20 @@ var edge1, edge2, edge3, edge4;
 var level = 1;
 var enemiesAlive = 1;
 var invincibilityPeriod = 0;
+var levelStarted = true, enemiesSpawned = 1;
+var enemySpeed = 3;
+var turnSpeed = 30;
+var playerSpeed = 5;
+var shieldTime = 20;
+var slowDownTime = 5;
+var freezeTime = 0, freezeAll = false, baseFreeze = 20;
+var nextTimeToFreeze = 20, nextTimeToInvincible  = 0;
+
+//Variables for the shopsystem
+var speedText, lifeText, shieldText, freezeText, shopText;
+var speedCostText, lifeCostText, shieldCostText, freezeText;
+var speedCost = 20, lifeCost = 50, shieldCost = 30, freezeCost = 10;
+var shopButton, speedButton, lifeButton, shieldButton, freezeButton, backButton;
 
 function preload(){
     gunImg = loadImage("Gun.png");
@@ -26,6 +39,7 @@ function preload(){
     playerImg = loadImage("Player.png");
     playerHurtImg = loadImage("PlayerHurt.png");
     playerCollectImg = loadImage("PlayerCollect.png");
+    playerInvincibleImg = loadImage("PlayerInvincible.png");
     enemyAnimation = loadAnimation("Enemy1.png","Enemy2.png");
     coinImg = loadImage("Coin.png");
 }
@@ -35,46 +49,16 @@ function setup(){
     player = createSprite(300,300,50,50);
     player.addImage(playerHurtImg);
     player.addImage(playerCollectImg);
+    player.addImage(playerInvincibleImg);
     player.addImage(playerImg);
     player.scale = 0.7;
     gun = createSprite(player.x,player.y+10,50,50);
     gun.addImage(gunImg)
     gun.scale = 0.1;
 
-    /*
-    enemy1 = createSprite(300,200,30,30);
-    enemy1.addAnimation("Walk",enemyAnimation);
-    enemy1.scale = 0.65;
-
-    enemy2 = createSprite(300,200,30,30);
-    enemy2.addAnimation("Walk",enemyAnimation);
-    enemy2.scale = 0.65;
-
-    enemy3 = createSprite(300,200,30,30);
-    enemy3.addAnimation("Walk",enemyAnimation);
-    enemy3.scale = 0.65;
-
-    enemy4 = createSprite(300,200,30,30);
-    enemy4.addAnimation("Walk",enemyAnimation);
-    enemy4.scale = 0.65;
-
-    enemy5 = createSprite(300,200,30,30);
-    enemy5.addAnimation("Walk",enemyAnimation);
-    enemy5.scale = 0.65;
-    */
-
     weakEnemiesGroup = new Group();
     bulletsGroup = new Group()
     coinsGroup = new Group(); 
-
-    /*
-    weakEnemiesGroup.add(enemy1);
-    weakEnemiesGroup.add(enemy2);
-    weakEnemiesGroup.add(enemy3);
-    weakEnemiesGroup.add(enemy4);
-    weakEnemiesGroup.add(enemy5);
-    */
-    
 
     edge1 = createSprite(0,0,1200,20);
     edge2 = createSprite(0,600,1200,20);
@@ -85,6 +69,9 @@ function setup(){
     edge2.shapeColor = "black";
     edge3.shapeColor = "black";
     edge4.shapeColor = "black";
+
+    shopElements();
+    freezeTime = baseFreeze;
 
     createEnemies();
 }
@@ -191,16 +178,227 @@ function createEnemies(){
     }
 }
 
+
+function upgradeSpeed(){
+    if(coinCount >= speedCost && playerSpeed < 12){
+        playerSpeed += 1;
+        coinCount -= speedCost;
+        speedCost += 5;
+        speedCostText.html(speedCost + " Coins");
+    }
+
+    if(playerSpeed === 12){
+        speedCostText.html("Fully Upgraded");
+    }
+}
+
+function upgradeLife(){
+    if(coinCount >= lifeCost && life < 15){
+        life += 1;
+        coinCount -= lifeCost;
+        lifeCostText.html(lifeCost + " Coins");
+    }
+
+    if(life === 15){
+        lifeCostText.html("Max Lives");  
+    }
+}
+
+function upgradeShield(){
+   if(coinCount >= shieldCost && shieldTime < 45){
+       shieldTime += 5;
+       coinCount -= shieldCost;
+       shieldCost += 15
+       shieldCostText.html(shieldCost + " Coins");
+    }
+
+    if(shieldTime === 45){
+        shieldCostText.html("Fully Upgraded");
+    }
+}
+
+function upgradeFreezeTime(){
+    if(coinCount >= freezeCost && baseFreeze < 45){
+        baseFreeze += 5
+        coinCount -= freezeCost;
+        freezeCost += 10
+        freezeCostText.html(freezeCost + " Coins");
+    }
+ 
+    if(baseFreeze === 45){
+        freezeCostText.html("Fully Upgraded");
+    } 
+    
+}
+
+function shopElements(){
+    // All the buttons
+    shopButton = createButton("Shop");
+    shopButton.position(610,10);
+
+    backButton = createButton("Back");
+    backButton.position(610,10);
+
+    speedButton = createButton("Upgrade");
+    speedButton.position(670,50);
+
+    lifeButton = createButton("Upgrade");
+    lifeButton.position(670,80);
+
+    shieldButton = createButton("Upgrade");
+    shieldButton.position(670,110);
+
+    freezeButton = createButton("Upgrade");
+    freezeButton.position(670,140);
+
+    //All the text
+
+    shopText = createElement("h2")
+    shopText.style('color', 'blue');
+    shopText.html("Shop");
+    shopText.position(690, -13)
+
+    speedText = createElement("h4"); 
+    speedText.html("Speed");
+    speedText.position(612,30)
+
+    lifeText = createElement("h4"); 
+    lifeText.html("Life");
+    lifeText.position(612,60)
+
+    shieldText = createElement("h4"); 
+    shieldText.html("Shield");
+    shieldText.position(612,90)
+
+    freezeText = createElement("h4"); 
+    freezeText.html("Freeze");
+    freezeText.position(612,120)
+
+    speedCostText = createElement("h4"); 
+    speedCostText.html(speedCost + " Coins");
+    speedCostText.position(750,30)
+
+    lifeCostText = createElement("h4"); 
+    lifeCostText.html(lifeCost + " Coins");
+    lifeCostText.position(750,60)
+
+    shieldCostText = createElement("h4"); 
+    shieldCostText.html(shieldCost + " Coins");
+    shieldCostText.position(750,90)
+
+    freezeCostText = createElement("h4"); 
+    freezeCostText.html(freezeCost + " Coins");
+    freezeCostText.position(750,120)
+
+    speedButton.hide();
+    speedText.hide();
+
+    lifeButton.hide();
+    lifeText.hide();
+
+    shieldButton.hide();
+    shieldText.hide();
+
+    freezeButton.hide();
+    freezeText.hide();
+
+    speedCostText.hide();
+    lifeCostText.hide();
+    shieldCostText.hide();
+    freezeCostText.hide();
+
+    shopText.hide();
+    backButton.hide();
+
+    shopButton.mousePressed(openShop);
+    backButton.mousePressed(closeShop);
+
+    //Upgrade the player
+    speedButton.mousePressed(upgradeSpeed);
+    lifeButton.mousePressed(upgradeLife);
+    shieldButton.mousePressed(upgradeShield);
+    freezeButton.mousePressed(upgradeFreezeTime);
+}
+
+function openShop(){
+    shopButton.hide();
+    backButton.show();
+
+    speedButton.show();
+    speedText.show();
+
+    lifeButton.show();
+    lifeText.show();
+
+    shieldButton.show();
+    shieldText.show();
+
+    freezeButton.show();
+    freezeText.show();
+    
+    speedCostText.show();
+    lifeCostText.show();
+    shieldCostText.show();
+    freezeCostText.show();
+
+    shopText.show();
+}
+
+function closeShop(){
+    shopButton.show();
+    backButton.hide();
+
+    speedButton.hide();
+    speedText.hide();
+
+    lifeButton.hide();
+    lifeText.hide();
+
+    shieldButton.hide();
+    shieldText.hide();
+
+    freezeButton.hide();
+    freezeText.hide();
+    
+    speedCostText.hide();
+    lifeCostText.hide();
+    shieldCostText.hide();
+    freezeCostText.hide();
+
+    shopText.hide();
+}
+
+
 function draw() {
+    console.log(freezeTime);
+
     if(enemiesAlive === 0){
         level += 1
-        enemiesToBeSpawned();
+        nextLevel();
         console.log(level);
     }
 
+    if(nextTimeToFreeze > 0){
+        nextTimeToFreeze -= 0.5;
+    }
+
+    if(nextTimeToInvincible > 0){
+        nextTimeToInvincible -= 0.5;
+    }
 
     if(invincibilityPeriod > 0){
         invincibilityPeriod -= 0.5;
+        player.addImage(playerInvincibleImg);
+        resetColor =  invincibilityPeriod;
+    }
+
+    if(freezeTime > 0){
+        freezeTime -= 0.5;
+        freezeAll = true;
+    }
+
+    if(freezeTime === 0){
+        freezeAll =  false;
     }
 
     background(255,100,100);
@@ -220,20 +418,29 @@ function draw() {
 
     if(gameState === 1){
         if(keyDown("a")){
-            player.x -= 5;
+            player.x -= playerSpeed;
         }
-            if(keyDown("d")){
-            player.x += 5;
+        if(keyDown("d")){
+            player.x += playerSpeed;
         }
-            if(keyDown("w")){
-            player.y -= 5;
+        if(keyDown("w")){
+            player.y -= playerSpeed;
         }
-            if(keyDown("s")){
-            player.y += 5;
+        if(keyDown("s")){
+            player.y += playerSpeed;
         }
-            if(mouseWentDown("leftButton") && shootTimer === 0){
+        if(mouseWentDown("leftButton") && shootTimer === 0){
             shootTimer = 10;
             createBullets(gun.x,gun.y);
+        }
+        
+        if(keyWentDown("e") && nextTimeToInvincible <= 0){
+            invincibilityPeriod = shieldTime;
+            nextTimeToInvincible = invincibilityPeriod + 40;
+        }
+        if(keyWentDown("f") && nextTimeToFreeze <= 0 ){
+            freezeTime = baseFreeze;
+            nextTimeToFreeze = freezeTime + 40;
         }
 
     }else if(gameState === 2){
@@ -247,83 +454,92 @@ function draw() {
         }
     }
 
-    if(enemiesAlive >= 1){
-        if(randomDir1 === 1){
-            enemy1.x -= 3;
-            } else if(randomDir1 === 2){
-            enemy1.x += 3;
-            }else if(randomDir1 === 3){
-            enemy1.y -= 3;
-            }else if(randomDir1 === 4){
-            enemy1.y += 3;
-        }
+    if(levelStarted === true){
+        enemiesSpawned = enemiesAlive;
+        levelStarted = false;
     }
 
-    if(enemiesAlive >= 2){
-        if(randomDir2 === 1){
-            enemy2.x -= 3;
-            } else if(randomDir2 === 2){
-            enemy2.x += 3;
-            }else if(randomDir2 === 3){
-            enemy2.y -= 3;
-            }else if(randomDir2 === 4){
-            enemy2.y += 3;
-        }   
-    }
-    
-    if(enemiesAlive >= 3){
-        if(randomDir3 === 1){
-            enemy3.x -= 3;
-            } else if(randomDir3 === 2){
-            enemy3.x += 3;
-            }else if(randomDir3 === 3){
-            enemy3.y -= 3;
-            }else if(randomDir3 === 4){
-            enemy3.y += 3;
-        }
-   }
 
-    if(enemiesAlive >= 4){
-        if(randomDir4 === 1){
-            enemy4.x -= 3;
-            } else if(randomDir4 === 2){
-            enemy4.x += 3;
-            }else if(randomDir4 === 3){
-            enemy4.y -= 3;
-            }else if(randomDir4 === 4){
-            enemy4.y += 3;
+    if(freezeAll === false){
+        if(enemiesSpawned >= 1){
+            if(randomDir1 === 1){
+                enemy1.x -= enemySpeed;
+                } else if(randomDir1 === 2){
+                enemy1.x += enemySpeed;
+                }else if(randomDir1 === 3){
+                enemy1.y -= enemySpeed;
+                }else if(randomDir1 === 4){
+                enemy1.y += enemySpeed;
+            }
         }
-    }
 
-    if(enemiesAlive >= 5){
-        if(randomDir5 === 1){
-            enemy5.x -= 3;
-            } else if(randomDir5 === 2){
-            enemy5.x += 3;
-            }else if(randomDir5 === 3){
-            enemy5.y -= 3;
-            }else if(randomDir5 === 4){
-            enemy5.y += 3;
+        if(enemiesSpawned >= 2){
+            if(randomDir2 === 1){
+                enemy2.x -= enemySpeed;
+                } else if(randomDir2 === 2){
+                enemy2.x += enemySpeed;
+                }else if(randomDir2 === 3){
+                enemy2.y -= enemySpeed;
+                }else if(randomDir2 === 4){
+                enemy2.y += enemySpeed;
+            }   
         }
+        
+        if(enemiesSpawned >= 3){
+            if(randomDir3 === 1){
+                enemy3.x -= enemySpeed;
+                } else if(randomDir3 === 2){
+                enemy3.x += enemySpeed;
+                }else if(randomDir3 === 3){
+                enemy3.y -= enemySpeed;
+                }else if(randomDir3 === 4){
+                enemy3.y += enemySpeed;
+            }
     }
 
-    if(Math.round(World.frameCount) % 30 === 0){ 
-       if(enemiesAlive >= 1){
-        randomDir1 = Math.round(random(1,4));
-        if(enemiesAlive >=2){
-            randomDir2 = Math.round(random(1,4));
-            if(enemiesAlive>=3){
-                randomDir3 = Math.round(random(1,4));
-                if(enemiesAlive >= 4){
-                    randomDir4 = Math.round(random(1,4));
-                    if(enemiesAlive >=5){
-                        randomDir5 = Math.round(random(1,4));
+        if(enemiesSpawned >= 4){
+            if(randomDir4 === 1){
+                enemy4.x -= enemySpeed;
+                } else if(randomDir4 === 2){
+                enemy4.x += enemySpeed;
+                }else if(randomDir4 === 3){
+                enemy4.y -= enemySpeed;
+                }else if(randomDir4 === 4){
+                enemy4.y += enemySpeed;
+            }
+        }
+
+        if(enemiesSpawned >= 5){
+            if(randomDir5 === 1){
+                enemy5.x -= enemySpeed;
+                } else if(randomDir5 === 2){
+                enemy5.x += enemySpeed;
+                }else if(randomDir5 === 3){
+                enemy5.y -= enemySpeed;
+                }else if(randomDir5 === 4){
+                enemy5.y += enemySpeed;
+            }
+        }
+
+        if(Math.round(World.frameCount) % turnSpeed === 0){ 
+        if(enemiesSpawned >= 1){
+            randomDir1 = Math.round(random(1,4));
+            if(enemiesSpawned >=2){
+                randomDir2 = Math.round(random(1,4));
+                if(enemiesSpawned>=3){
+                    randomDir3 = Math.round(random(1,4));
+                    if(enemiesSpawned >= 4){
+                        randomDir4 = Math.round(random(1,4));
+                        if(enemiesSpawned >=5){
+                            randomDir5 = Math.round(random(1,4));
+                        }
                     }
-                }
-            }    
+                }    
+            }
         }
-       }
+        }
     }
+
 
     if(player.isTouching(weakEnemiesGroup) && life > 0 && invincibilityPeriod <= 0){
         player.addImage(playerHurtImg);
@@ -332,6 +548,8 @@ function draw() {
         player.x = 200;
         player.y = 200;
         invincibilityPeriod = 20;
+        nextTimeToInvincible = 0;
+        lifeCostText.html(lifeCost + " Coins")
     }
 
     if(resetColor > 0){
@@ -359,7 +577,7 @@ function draw() {
     bulletsGroup.overlap(weakEnemiesGroup,kill);
     player.overlap(coinsGroup,addCoin);
 
-    console.log(enemiesAlive)
+    //console.log(enemiesAlive)
     drawSprites();
 }
 
@@ -383,9 +601,20 @@ function addCoin(spriteA,spriteB){
     coinCount += 1;
 }
 
-function enemiesToBeSpawned(){
+function nextLevel(){
     enemiesAlive = Math.round(random(2,5));
-    console.log(enemiesAlive)
+    nextTimeToInvincible = 0;
+    nextTimeToFreeze = 0;
+
+    if(level % 3 === 0 && enemySpeed > 8){
+        enemySpeed += 0.5;
+    }
+
+    if(level % 5 === 0 && turnSpeed < 10){
+        turnSpeed -= 0.5
+    }
+
     createEnemies();
+    levelStarted = true;
     invincibilityPeriod = 20;
 }
