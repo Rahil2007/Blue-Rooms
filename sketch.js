@@ -475,11 +475,6 @@ function draw() {
     }
 
     if(bossHasSpawned === true){
-        
-        boss.bounceOff(edge1);
-        boss.bounceOff(edge2);
-        boss.bounceOff(edge3);
-        boss.bounceOff(edge4);
 
         if(Math.round(World.frameCount) % 10 === 0){ 
             randomDirBoss = Math.round(random(1,4));
@@ -511,7 +506,7 @@ function draw() {
             randomDirBoss = 2
         }
 
-        if(player.isTouching(boss)){
+        if(player.isTouching(boss) && invincibilityPeriod <= 0){
             life -= 1;
             resetColor = 50;
             player.x = 200;
@@ -531,6 +526,12 @@ function draw() {
             bossHasSpawned = false;
             coinCount += 20;
         }
+
+        boss.bounceOff(edge1);
+        boss.bounceOff(edge2);
+        boss.bounceOff(edge3);
+        boss.bounceOff(edge4);
+
     }
 
     if(freezeAll === false){
