@@ -1,9 +1,10 @@
 var player, playerImg, playerHurtImg, playerCollectImg, playerInvincibleImg;
-var enemy1,enemy2 ,enemy3 ,enemy4 ,enemy5 ,enemyAnimation;
+var enemy1,enemy2 ,enemy3 ,enemy4 ,enemy5 ,enemyImage;
+var boss, bossImage, bossHealth = 1, bossHasSpawned = false;
 var coin,coinImg;
 var gun, gunImg;
 var bullet, bulletImg;
-var randomDir1, randomDir2, randomDir3, randomDir4, randomDir5;
+var randomDir1, randomDir2, randomDir3, randomDir4, randomDir5, randomDirBoss;
 var life = 3;
 var resetColor;
 var gameState = 1;
@@ -42,6 +43,7 @@ function preload(){
     playerInvincibleImg = loadImage("PlayerInvincible.png");
     enemyAnimation = loadAnimation("Enemy1.png","Enemy2.png");
     coinImg = loadImage("Coin.png");
+    bossImage = loadImage("Boss.png")
 }
 
 function setup(){
@@ -52,6 +54,7 @@ function setup(){
     player.addImage(playerInvincibleImg);
     player.addImage(playerImg);
     player.scale = 0.7;
+
     gun = createSprite(player.x,player.y+10,50,50);
     gun.addImage(gunImg)
     gun.scale = 0.1;
@@ -60,9 +63,13 @@ function setup(){
     bulletsGroup = new Group()
     coinsGroup = new Group(); 
 
+    //Top Edge
     edge1 = createSprite(0,0,1200,20);
+    //Bottom Edge
     edge2 = createSprite(0,600,1200,20);
+    //Left Edge
     edge3 = createSprite(0,0,20,1200);
+    //Right Edge
     edge4 = createSprite(600,0,20,1200);
 
     edge1.shapeColor = "black";
@@ -177,7 +184,6 @@ function createEnemies(){
         weakEnemiesGroup.add(enemy5);
     }
 }
-
 
 function upgradeSpeed(){
     if(coinCount >= speedCost && playerSpeed < 12){
@@ -368,11 +374,20 @@ function closeShop(){
     shopText.hide();
 }
 
+function startBossFight(){
+    boss = createSprite(300,70,10,10);
+    boss.addImage(bossImage)
+    boss.scale = 0.3;
+
+    bossHasSpawned = true;
+    enemiesAlive = 0;
+}
+
 
 function draw() {
     console.log(freezeTime);
 
-    if(enemiesAlive === 0){
+    if(enemiesAlive === 0 && bossHasSpawned === false){
         level += 1
         nextLevel();
         console.log(level);
@@ -459,6 +474,64 @@ function draw() {
         levelStarted = false;
     }
 
+    if(bossHasSpawned === true){
+        
+        boss.bounceOff(edge1);
+        boss.bounceOff(edge2);
+        boss.bounceOff(edge3);
+        boss.bounceOff(edge4);
+
+        if(Math.round(World.frameCount) % 10 === 0){ 
+            randomDirBoss = Math.round(random(1,4));
+        }
+
+        if(randomDirBoss === 1){
+            boss.x -= 9;
+            } else if(randomDirBoss === 2){
+            boss.x += 9;
+            }else if(randomDirBoss === 3){
+            boss.y -= 9;
+            }else if(randomDirBoss === 4){
+            boss.y += 9;
+        }
+
+        if(boss.isTouching(edge1)){
+            randomDirBoss = 3
+        }
+
+        if(boss.isTouching(edge2)){
+            randomDirBoss = 4
+        }
+
+        if(boss.isTouching(edge3)){
+            randomDirBoss = 1
+        }
+
+        if(boss.isTouching(edge4)){
+            randomDirBoss = 2
+        }
+
+        if(player.isTouching(boss)){
+            life -= 1;
+            resetColor = 50;
+            player.x = 200;
+            player.y = 200;
+            invincibilityPeriod = 20;
+            nextTimeToInvincible = 0;
+            lifeCostText.html(lifeCost + " Coins")
+        }
+
+        bulletsGroup.overlap(boss,reduceHealth);
+
+        if(bossHealth === 0){
+            level += 1
+            boss.destroy();
+            nextLevel();
+            console.log(level);
+            bossHasSpawned = false;
+            coinCount += 20;
+        }
+    }
 
     if(freezeAll === false){
         if(enemiesSpawned >= 1){
@@ -522,27 +595,26 @@ function draw() {
         }
 
         if(Math.round(World.frameCount) % turnSpeed === 0){ 
-        if(enemiesSpawned >= 1){
-            randomDir1 = Math.round(random(1,4));
-            if(enemiesSpawned >=2){
-                randomDir2 = Math.round(random(1,4));
-                if(enemiesSpawned>=3){
-                    randomDir3 = Math.round(random(1,4));
-                    if(enemiesSpawned >= 4){
-                        randomDir4 = Math.round(random(1,4));
-                        if(enemiesSpawned >=5){
-                            randomDir5 = Math.round(random(1,4));
+            if(enemiesSpawned >= 1){
+                randomDir1 = Math.round(random(1,4));
+                if(enemiesSpawned >=2){
+                    randomDir2 = Math.round(random(1,4));
+                    if(enemiesSpawned>=3){
+                        randomDir3 = Math.round(random(1,4));
+                        if(enemiesSpawned >= 4){
+                            randomDir4 = Math.round(random(1,4));
+                            if(enemiesSpawned >=5){
+                                randomDir5 = Math.round(random(1,4));
+                            }
                         }
-                    }
-                }    
+                    }    
+                }
             }
-        }
         }
     }
 
 
-    if(player.isTouching(weakEnemiesGroup) && life > 0 && invincibilityPeriod <= 0){
-        player.addImage(playerHurtImg);
+    if(player.isTouching(weakEnemiesGroup)&& life > 0 && invincibilityPeriod <= 0){
         life -= 1;
         resetColor = 50;
         player.x = 200;
@@ -586,6 +658,16 @@ function kill(spriteA,spriteB){
     spriteB.destroy();
 }
 
+function reduceHealth(spriteA, spriteB){
+    if(bossHealth > 0){
+        spriteA.destroy();
+        bossHealth -= 1
+    } else if(bossHealth === 0){
+        spriteA.destroy();
+        spriteB.destroy();
+    }
+}
+
 function dropCoin(spriteA){
     coin = createSprite(spriteA.x,spriteA.y,20,20);
     coin.addImage(coinImg);
@@ -614,7 +696,15 @@ function nextLevel(){
         turnSpeed -= 0.5
     }
 
+    if(level % 10 === 0){
+        startBossFight();
+        if(bossHealth <= 20){
+            bossHealth += 2
+        }
+    }
+
     createEnemies();
+    
     levelStarted = true;
     invincibilityPeriod = 20;
 }
