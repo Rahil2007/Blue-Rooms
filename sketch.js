@@ -1,4 +1,5 @@
 var player, playerImg, playerHurtImg, playerCollectImg, playerInvincibleImg;
+var tank, tankImg, tankMode = false, spawnTankTime = 0, tankModeTime, baseTankModeTime = 60, tankSpeed = 4;
 var enemy1,enemy2 ,enemy3 ,enemy4 ,enemy5 ,enemyImage;
 var boss, bossImage, bossHealth = 1, bossHasSpawned = false;
 var coin,coinImg;
@@ -14,7 +15,7 @@ var GameOverText;
 var RestartText;
 var levelText;
 var livesText;
-var coinCount = 0;
+var coinCount = 10000;
 var edge1, edge2, edge3, edge4;
 var level = 1;
 var enemiesAlive = 1;
@@ -26,13 +27,14 @@ var playerSpeed = 5;
 var shieldTime = 20;
 var slowDownTime = 5;
 var freezeTime = 0, freezeAll = false, baseFreeze = 20;
-var nextTimeToFreeze = 20, nextTimeToInvincible  = 0;
+var nextTimeToFreeze = 20, nextTimeToInvincible  = 0, nextTimeToTank = 500;
+var song;
 
 //Variables for the shopsystem
-var speedText, lifeText, shieldText, freezeText, shopText;
-var speedCostText, lifeCostText, shieldCostText, freezeText;
-var speedCost = 20, lifeCost = 50, shieldCost = 30, freezeCost = 10;
-var shopButton, speedButton, lifeButton, shieldButton, freezeButton, backButton;
+var speedText, lifeText, shieldText, freezeText, shopText, tankText;
+var speedCostText, lifeCostText, shieldCostText, freezeCostText, tankCostText;
+var speedCost = 20, lifeCost = 50, shieldCost = 30, freezeCost = 10, tankCost = 40;
+var shopButton, speedButton, lifeButton, shieldButton, freezeButton, tankButton, backButton;
 
 function preload(){
     gunImg = loadImage("Gun.png");
@@ -43,7 +45,9 @@ function preload(){
     playerInvincibleImg = loadImage("PlayerInvincible.png");
     enemyAnimation = loadAnimation("Enemy1.png","Enemy2.png");
     coinImg = loadImage("Coin.png");
-    bossImage = loadImage("Boss.png")
+    bossImage = loadImage("Boss.png");
+    tankImg = loadImage("tank.png");
+    song = loadSound("Theme.mp3");
 }
 
 function setup(){
@@ -81,15 +85,26 @@ function setup(){
     freezeTime = baseFreeze;
 
     createEnemies();
+
 }
 
 function createBullets(x,y){
-    bullet = createSprite(x,y,20,20);;
+    bullet = createSprite(x,y,20,20);
     bullet.addImage(bulletImg);
     bullet.scale = 0.3;
     bullet.lifetime = 50;
     bullet.rotation = gun.rotation;
     bullet.setSpeedAndDirection(10,gun.rotation-180);
+    bulletsGroup.add(bullet);
+}
+
+function createTankBullets(x,y){
+    bullet = createSprite(x,y,20,20);
+    bullet.addImage(bulletImg);
+    bullet.scale = 0.3;
+    bullet.lifetime = 50;
+    bullet.rotation = 90;
+    bullet.setSpeedAndDirection(-10);
     bulletsGroup.add(bullet);
 }
 
@@ -237,6 +252,21 @@ function upgradeFreezeTime(){
     
 }
 
+function upgradeTankTime(){
+    if(coinCount >= tankCost && baseTankModeTime < 180){
+        baseTankModeTime += 20;
+        nextTimeToTank -= 20;
+        tankSpeed += 1;
+        coinCount -= tankCost;
+        tankCost += 15
+        tankCostText.html(tankCost + " Coins");
+    }
+
+    if(baseTankModeTime === 180){
+        tankCostText.html("Fully Upgraded");
+    }
+}
+
 function shopElements(){
     // All the buttons
     shopButton = createButton("Shop");
@@ -256,6 +286,9 @@ function shopElements(){
 
     freezeButton = createButton("Upgrade");
     freezeButton.position(670,140);
+
+    tankButton = createButton("Upgrade");
+    tankButton.position(670,170);
 
     //All the text
 
@@ -280,6 +313,10 @@ function shopElements(){
     freezeText.html("Freeze");
     freezeText.position(612,120)
 
+    tankText = createElement("h4"); 
+    tankText.html("Tank");
+    tankText.position(612,150)
+
     speedCostText = createElement("h4"); 
     speedCostText.html(speedCost + " Coins");
     speedCostText.position(750,30)
@@ -296,6 +333,10 @@ function shopElements(){
     freezeCostText.html(freezeCost + " Coins");
     freezeCostText.position(750,120)
 
+    tankCostText = createElement("h4"); 
+    tankCostText.html(tankCost + " Coins");
+    tankCostText.position(750,150)
+
     speedButton.hide();
     speedText.hide();
 
@@ -308,10 +349,14 @@ function shopElements(){
     freezeButton.hide();
     freezeText.hide();
 
+    tankButton.hide();
+    tankText.hide();
+
     speedCostText.hide();
     lifeCostText.hide();
     shieldCostText.hide();
     freezeCostText.hide();
+    tankCostText.hide();
 
     shopText.hide();
     backButton.hide();
@@ -324,6 +369,7 @@ function shopElements(){
     lifeButton.mousePressed(upgradeLife);
     shieldButton.mousePressed(upgradeShield);
     freezeButton.mousePressed(upgradeFreezeTime);
+    tankButton.mousePressed(upgradeTankTime);
 }
 
 function openShop(){
@@ -341,11 +387,15 @@ function openShop(){
 
     freezeButton.show();
     freezeText.show();
+
+    tankButton.show();
+    tankText.show();
     
     speedCostText.show();
     lifeCostText.show();
     shieldCostText.show();
     freezeCostText.show();
+    tankCostText.show();
 
     shopText.show();
 }
@@ -365,11 +415,15 @@ function closeShop(){
 
     freezeButton.hide();
     freezeText.hide();
+
+    tankButton.hide();
+    tankText.hide();
     
     speedCostText.hide();
     lifeCostText.hide();
     shieldCostText.hide();
     freezeCostText.hide();
+    tankCostText.hide();
 
     shopText.hide();
 }
@@ -383,9 +437,12 @@ function startBossFight(){
     enemiesAlive = 0;
 }
 
-
 function draw() {
-    console.log(freezeTime);
+    console.log(spawnTankTime);
+    
+    if(spawnTankTime > 0){
+        spawnTankTime -= 1;
+    }
 
     if(enemiesAlive === 0 && bossHasSpawned === false){
         level += 1
@@ -431,32 +488,86 @@ function draw() {
         shootTimer -= 1;
     }
 
+    if(keyWentDown("r")){
+     if (song.isPlaying()) {
+        song.stop();
+      } else {
+        song.play();
+      }
+    }
+
     if(gameState === 1){
-        if(keyDown("a")){
-            player.x -= playerSpeed;
+        if(tankMode === false){
+            if(keyDown("a")){
+                player.x -= playerSpeed;
+            }
+            if(keyDown("d")){
+                player.x += playerSpeed;
+            }
+            if(keyDown("w")){
+                player.y -= playerSpeed;
+            }
+            if(keyDown("s")){
+                player.y += playerSpeed;
+            }
+            if(mouseWentDown("leftButton") && shootTimer === 0){
+                shootTimer = 10;
+                createBullets(gun.x,gun.y);
+            }
+            
+            if(keyWentDown("e") && nextTimeToInvincible <= 0){
+                invincibilityPeriod = shieldTime;
+                nextTimeToInvincible = invincibilityPeriod + 40;
+            }
+            if(keyWentDown("f") && nextTimeToFreeze <= 0 ){
+                freezeTime = baseFreeze;
+                nextTimeToFreeze = freezeTime + 40;
+            }
         }
-        if(keyDown("d")){
-            player.x += playerSpeed;
+
+        if(spawnTankTime === 0 && keyWentDown("t")){
+            startTank();
+            tankMode = true;
+            spawnTankTime === nextTimeToTank;
+            tankModeTime = baseTankModeTime;
+            player.position.x = 10000
         }
-        if(keyDown("w")){
-            player.y -= playerSpeed;
+
+        if(tankMode === true){
+            
+            if(keyDown("a")){
+                tank.x -= tankSpeed;
+            }
+
+            if(keyDown("d")){
+                tank.x += tankSpeed;
+            }
+
+            if(mouseWentDown("leftButton")){
+               createTankBullets(tank.x,tank.y-40)
+            }
+            
+            tank.bounceOff(edge1);
+            tank.bounceOff(edge2);
+            tank.bounceOff(edge3);
+            tank.bounceOff(edge4);
+
+            tank.overlap(weakEnemiesGroup,destroyEnemy)
+
+            
+            if(tankModeTime > 0){
+                tankModeTime -= 1;
+            }
+
+            if(tankModeTime <= 0){
+                spawnTankTime = nextTimeToTank;
+                tankMode = false;
+                player.position.x = 300;
+                player.position.y = 500;
+                tank.destroy();
+            }
         }
-        if(keyDown("s")){
-            player.y += playerSpeed;
-        }
-        if(mouseWentDown("leftButton") && shootTimer === 0){
-            shootTimer = 10;
-            createBullets(gun.x,gun.y);
-        }
-        
-        if(keyWentDown("e") && nextTimeToInvincible <= 0){
-            invincibilityPeriod = shieldTime;
-            nextTimeToInvincible = invincibilityPeriod + 40;
-        }
-        if(keyWentDown("f") && nextTimeToFreeze <= 0 ){
-            freezeTime = baseFreeze;
-            nextTimeToFreeze = freezeTime + 40;
-        }
+
 
     }else if(gameState === 2){
         player.visible = false;
@@ -468,6 +579,7 @@ function draw() {
             window.location.reload();
         }
     }
+
 
     if(levelStarted === true){
         enemiesSpawned = enemiesAlive;
@@ -531,7 +643,6 @@ function draw() {
         boss.bounceOff(edge2);
         boss.bounceOff(edge3);
         boss.bounceOff(edge4);
-
     }
 
     if(freezeAll === false){
@@ -654,8 +765,19 @@ function draw() {
     drawSprites();
 }
 
+
+function startTank(){
+    tank = createSprite(300,540,10,10); 
+    tank.addImage(tankImg);
+    tank.scale = 0.25;
+}
+
 function kill(spriteA,spriteB){
     spriteA.destroy();
+    spriteB.destroy();
+}
+
+function destroyEnemy(spriteA, spriteB){
     spriteB.destroy();
 }
 
