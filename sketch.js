@@ -15,7 +15,7 @@ var GameOverText;
 var RestartText;
 var levelText;
 var livesText;
-var coinCount = 10000;
+var coinCount = 0;
 var edge1, edge2, edge3, edge4;
 var level = 1;
 var enemiesAlive = 1;
