@@ -841,7 +841,7 @@ function nextLevel(){
         turnSpeed -= 0.5
     }
 
-    if(level % 2 === 0){
+    if(level % 10 === 0){
         startBossFight();
         if(bossHealth <= 20){
             bossHealth += 2
