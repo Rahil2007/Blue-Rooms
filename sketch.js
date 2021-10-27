@@ -1,7 +1,7 @@
 var player, playerImg, playerHurtImg, playerCollectImg, playerInvincibleImg;
 var tank, tankImg, tankMode = false, spawnTankTime = 0, tankModeTime, baseTankModeTime = 60, tankSpeed = 4;
 var enemy1,enemy2 ,enemy3 ,enemy4 ,enemy5 ,enemyImage;
-var boss, bossImage, bossHealth = 1, bossHasSpawned = false, bossTurnSpeed = 40;;
+var boss, bossImage, bossHealth = 1, bossHasSpawned = false, bossTurnSpeed = 10;
 var coin,coinImg;
 var gun, gunImg;
 var bullet, bulletImg;
@@ -429,9 +429,12 @@ function closeShop(){
 }
 
 function startBossFight(){
-    boss = createSprite(300,70,10,10);
+    boss = createSprite(300,300,10,10);
     boss.addImage(bossImage)
     boss.scale = 0.3;
+
+    boss.velocity.x = Math.round(random(9,14));
+    boss.velocity.y = Math.round(random(7,14));
 
     bossHasSpawned = true;
     enemiesAlive = 0;
@@ -588,7 +591,10 @@ function draw() {
 
     if(bossHasSpawned === true){
 
-        if(Math.round(World.frameCount) % bossTurnSpeed === 0){ 
+        //Previous boss movement
+        //#region 
+
+        /*if(Math.round(World.frameCount) % bossTurnSpeed === 0 && !boss.isTouching(edge1) && !boss.isTouching(edge2) && !boss.isTouching(edge3) && !boss.isTouching(edge4)){ 
             randomDirBoss = Math.round(random(1,4));
         }
 
@@ -604,22 +610,33 @@ function draw() {
 
         if(boss.isTouching(edge1)){
             randomDirBoss = 3
-            bossTurnSpeed = 40;
         }
 
         if(boss.isTouching(edge2)){
             randomDirBoss = 4
-            bossTurnSpeed = 40;
         }
 
         if(boss.isTouching(edge3)){
             randomDirBoss = 1
-            bossTurnSpeed = 40;
         }
 
         if(boss.isTouching(edge4)){
             randomDirBoss = 2
-            bossTurnSpeed = 40;
+        }*/
+        //#endregion
+        
+        if(boss.x > 595){
+            boss.velocity.x -= bossTurnSpeed;
+        } 
+        else if(boss.x < 5){
+            boss.velocity.x += bossTurnSpeed;
+        }
+
+        if(boss.y < 5){
+            boss.velocity.y -= bossTurnSpeed;
+        }
+        else if(boss.y > 595){ 
+            boss.velocity.y += bossTurnSpeed;
         }
 
         if(player.isTouching(boss) && invincibilityPeriod <= 0){
@@ -647,6 +664,7 @@ function draw() {
         boss.bounceOff(edge2);
         boss.bounceOff(edge3);
         boss.bounceOff(edge4);
+
     }
 
     if(freezeAll === false){
@@ -823,7 +841,7 @@ function nextLevel(){
         turnSpeed -= 0.5
     }
 
-    if(level % 10 === 0){
+    if(level % 2 === 0){
         startBossFight();
         if(bossHealth <= 20){
             bossHealth += 2
