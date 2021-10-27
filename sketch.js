@@ -1,7 +1,7 @@
 var player, playerImg, playerHurtImg, playerCollectImg, playerInvincibleImg;
 var tank, tankImg, tankMode = false, spawnTankTime = 0, tankModeTime, baseTankModeTime = 60, tankSpeed = 4;
 var enemy1,enemy2 ,enemy3 ,enemy4 ,enemy5 ,enemyImage;
-var boss, bossImage, bossHealth = 1, bossHasSpawned = false;
+var boss, bossImage, bossHealth = 1, bossHasSpawned = false, bossTurnSpeed = 40;;
 var coin,coinImg;
 var gun, gunImg;
 var bullet, bulletImg;
@@ -588,7 +588,7 @@ function draw() {
 
     if(bossHasSpawned === true){
 
-        if(Math.round(World.frameCount) % 40 === 0){ 
+        if(Math.round(World.frameCount) % bossTurnSpeed === 0){ 
             randomDirBoss = Math.round(random(1,4));
         }
 
@@ -604,18 +604,22 @@ function draw() {
 
         if(boss.isTouching(edge1)){
             randomDirBoss = 3
+            bossTurnSpeed = 40;
         }
 
         if(boss.isTouching(edge2)){
             randomDirBoss = 4
+            bossTurnSpeed = 40;
         }
 
         if(boss.isTouching(edge3)){
             randomDirBoss = 1
+            bossTurnSpeed = 40;
         }
 
         if(boss.isTouching(edge4)){
             randomDirBoss = 2
+            bossTurnSpeed = 40;
         }
 
         if(player.isTouching(boss) && invincibilityPeriod <= 0){
