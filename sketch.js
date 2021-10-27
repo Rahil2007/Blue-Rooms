@@ -249,7 +249,7 @@ function upgradeFreezeTime(){
     if(baseFreeze === 45){
         freezeCostText.html("Fully Upgraded");
     } 
-    
+
 }
 
 function upgradeTankTime(){
