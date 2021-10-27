@@ -588,7 +588,7 @@ function draw() {
 
     if(bossHasSpawned === true){
 
-        if(Math.round(World.frameCount) % 10 === 0){ 
+        if(Math.round(World.frameCount) % 40 === 0){ 
             randomDirBoss = Math.round(random(1,4));
         }
 
