@@ -36,6 +36,12 @@ var speedCostText, lifeCostText, shieldCostText, freezeCostText, tankCostText;
 var speedCost = 20, lifeCost = 50, shieldCost = 30, freezeCost = 10, tankCost = 40;
 var shopButton, speedButton, lifeButton, shieldButton, freezeButton, tankButton, backButton;
 
+//Variables for controls/options
+var optionsButton, musicSlider, musicText;
+var controlsText;
+var forwardInput,backInput, leftInput, rightInput,freezeInput,invincibileInput, TankInput;
+var forwardText,backText, leftText, rightText,freezeInpText,invincibileInpText, TankInpText;
+
 function preload(){
     gunImg = loadImage("Gun.png");
     bulletImg = loadImage("bullet.png")
@@ -52,6 +58,8 @@ function preload(){
 
 function setup(){
     createCanvas(600,600);
+    song.play();
+
     player = createSprite(300,300,50,50);
     player.addImage(playerHurtImg);
     player.addImage(playerCollectImg);
@@ -81,16 +89,10 @@ function setup(){
     edge3.shapeColor = "black";
     edge4.shapeColor = "black";
 
-    shopElements();
     freezeTime = baseFreeze;
 
+    UI();
     createEnemies();
-    songs();
-}
-
-function songs(){
-    song.loop();
-    song.play();
 }
 
 function createBullets(x,y){
@@ -272,8 +274,84 @@ function upgradeTankTime(){
     }
 }
 
-function shopElements(){
-    // All the buttons
+function UI(){
+
+    //All the UI for options
+    //Buttons & Sliders
+    optionsButton = createButton("Option")
+    optionsButton.position(660,10)
+
+    musicSlider = createSlider(0,1,0.3,0.01);
+    musicSlider.position(660,40);
+
+    //Input
+    forwardInput = createInput("W");
+    forwardInput.position(700,100)
+    forwardInput.size(20)
+
+    leftInput = createInput("A");
+    leftInput.position(700,130)
+    leftInput.size(20)
+
+    backwardInput = createInput("S");
+    backwardInput.position(700,160)
+    backwardInput.size(20)
+
+    rightInput = createInput("D");
+    rightInput.position(700,190)
+    rightInput.size(20)
+
+    invincibileInput = createInput("E");
+    invincibileInput.position(700,220)
+    invincibileInput.size(20)
+
+    freezeInput = createInput("F");
+    freezeInput.position(700,250)
+    freezeInput.size(20)
+  
+    TankInput = createInput("T");
+    TankInput.position(700,280)
+    TankInput.size(20)
+
+    //Text
+    musicText = createElement("h4");
+    musicText.html("Music");
+    musicText.position(610,20);
+
+    controlsText = createElement("h3");
+    controlsText.html("Controls");
+    controlsText.position(610,50)
+
+    forwardText = createElement("h4");
+    forwardText.html("Forward")
+    forwardText.position(610,80);
+
+    leftText = createElement("h4");
+    leftText.html("Left")
+    leftText.position(610,110);
+
+    backwardText = createElement("h4");
+    backwardText.html("Backward")
+    backwardText.position(610,140);
+
+    rightText = createElement("h4");
+    rightText.html("Right")
+    rightText.position(610,170);
+
+    invincibileInpText = createElement("h4");
+    invincibileInpText.html("Invincibility")
+    invincibileInpText.position(610,200);
+
+    freezeInpText = createElement("h4");
+    freezeInpText.html("Freeze")
+    freezeInpText.position(610,230);
+    
+    TankInpText = createElement("h4");
+    TankInpText.html("Tank")
+    TankInpText.position(610,260);
+
+    // All the buttons for shop system
+    //#region
     shopButton = createButton("Shop");
     shopButton.position(610,10);
 
@@ -294,14 +372,10 @@ function shopElements(){
 
     tankButton = createButton("Upgrade");
     tankButton.position(670,170);
+    //#endregion
 
-    //All the text
-
-    shopText = createElement("h2")
-    shopText.style('color', 'blue');
-    shopText.html("Shop");
-    shopText.position(690, -13)
-
+    //All the text for shop system
+    //#region
     speedText = createElement("h4"); 
     speedText.html("Speed");
     speedText.position(612,30)
@@ -341,7 +415,10 @@ function shopElements(){
     tankCostText = createElement("h4"); 
     tankCostText.html(tankCost + " Coins");
     tankCostText.position(750,150)
+    //#endregion
 
+    //Setting up the UI
+    //#region
     speedButton.hide();
     speedText.hide();
 
@@ -363,11 +440,39 @@ function shopElements(){
     freezeCostText.hide();
     tankCostText.hide();
 
-    shopText.hide();
     backButton.hide();
+
+    musicSlider.hide();
+    musicText.hide();
+
+    controlsText.hide();
+
+    forwardInput.hide();
+    forwardText.hide();
+
+    backwardInput.hide();
+    backwardText.hide();
+
+    leftInput.hide();
+    leftText.hide();
+
+    rightInput.hide();
+    rightText.hide();
+
+    freezeInput.hide();
+    freezeInpText.hide();
+
+    invincibileInput.hide();
+    invincibileInpText.hide();
+
+    TankInput.hide();
+    TankInpText.hide()
+
+    //#endregion
 
     shopButton.mousePressed(openShop);
     backButton.mousePressed(closeShop);
+    optionsButton.mousePressed(openOptions)
 
     //Upgrade the player
     speedButton.mousePressed(upgradeSpeed);
@@ -377,8 +482,64 @@ function shopElements(){
     tankButton.mousePressed(upgradeTankTime);
 }
 
+function openOptions(){
+    // hiding UI
+    //#region 
+    shopButton.hide();
+    optionsButton.hide();
+    backButton.show();
+
+    speedButton.hide();
+    speedText.hide();
+
+    lifeButton.hide();
+    lifeText.hide();
+
+    shieldButton.hide();
+    shieldText.hide();
+
+    freezeButton.hide();
+    freezeText.hide();
+
+    tankButton.hide();
+    tankText.hide();
+    
+    speedCostText.hide();
+    lifeCostText.hide();
+    shieldCostText.hide();
+    freezeCostText.hide();
+    tankCostText.hide();
+    //#endregion
+    controlsText.show();
+
+    forwardInput.show();
+    forwardText.show();
+
+    backwardInput.show();
+    backwardText.show();
+
+    leftInput.show();
+    leftText.show();
+
+    rightInput.show();
+    rightText.show();
+
+    freezeInput.show();
+    freezeInpText.show();
+
+    invincibileInput.show();
+    invincibileInpText.show();
+
+    TankInput.show();
+    TankInpText.show();
+    
+    musicSlider.show();
+    musicText.show();
+}
+
 function openShop(){
     shopButton.hide();
+    optionsButton.hide();
     backButton.show();
 
     speedButton.show();
@@ -401,12 +562,11 @@ function openShop(){
     shieldCostText.show();
     freezeCostText.show();
     tankCostText.show();
-
-    shopText.show();
 }
 
 function closeShop(){
     shopButton.show();
+    optionsButton.show();
     backButton.hide();
 
     speedButton.hide();
@@ -430,8 +590,33 @@ function closeShop(){
     freezeCostText.hide();
     tankCostText.hide();
 
-    shopText.hide();
+    musicSlider.hide();
+    musicText.hide();
+
+    controlsText.hide();
+
+    forwardInput.hide();
+    forwardText.hide();
+
+    backwardInput.hide();
+    backwardText.hide();
+
+    leftInput.hide();
+    leftText.hide();
+
+    rightInput.hide();
+    rightText.hide();
+
+    freezeInput.hide();
+    freezeInpText.hide();
+
+    invincibileInput.hide();
+    invincibileInpText.hide();
+
+    TankInput.hide();
+    TankInpText.hide();
 }
+
 
 function startBossFight(){
     boss = createSprite(300,300,10,10);
@@ -446,16 +631,10 @@ function startBossFight(){
 }
 
 function draw() {
-    console.log(spawnTankTime);
-    
+    song.setVolume(musicSlider.value());
+
     if(spawnTankTime > 0){
         spawnTankTime -= 1;
-    }
-
-    if(enemiesAlive === 0 && bossHasSpawned === false){
-        level += 1
-        nextLevel();
-        console.log(level);
     }
 
     if(nextTimeToFreeze > 0){
@@ -496,27 +675,24 @@ function draw() {
         shootTimer -= 1;
     }
 
-    if(keyWentDown("r")){
-     if (song.isPlaying()) {
-        song.stop();
-      } else {
-        song.loop();
-        song.play();
-      }
-    }
-
     if(gameState === 1){
+        if(enemiesAlive === 0 && bossHasSpawned === false){
+            level += 1
+            nextLevel();
+            console.log(level);
+        }
+
         if(tankMode === false){
-            if(keyDown("a")){
+            if(keyDown(leftInput.value())){
                 player.x -= playerSpeed;
             }
-            if(keyDown("d")){
+            if(keyDown(rightInput.value())){
                 player.x += playerSpeed;
             }
-            if(keyDown("w")){
+            if(keyDown(forwardInput.value())){
                 player.y -= playerSpeed;
             }
-            if(keyDown("s")){
+            if(keyDown(backwardInput.value())){
                 player.y += playerSpeed;
             }
             if(mouseWentDown("leftButton") && shootTimer === 0){
@@ -524,17 +700,17 @@ function draw() {
                 createBullets(gun.x,gun.y);
             }
             
-            if(keyWentDown("e") && nextTimeToInvincible <= 0){
+            if(keyWentDown(invincibileInput.value()) && nextTimeToInvincible <= 0){
                 invincibilityPeriod = shieldTime;
                 nextTimeToInvincible = invincibilityPeriod + 40;
             }
-            if(keyWentDown("f") && nextTimeToFreeze <= 0 ){
+            if(keyWentDown(freezeInput.value()) && nextTimeToFreeze <= 0 ){
                 freezeTime = baseFreeze;
                 nextTimeToFreeze = freezeTime + 40;
             }
         }
 
-        if(spawnTankTime === 0 && keyWentDown("t")){
+        if(spawnTankTime === 0 && keyWentDown(TankInput.value())){
             startTank();
             tankMode = true;
             spawnTankTime === nextTimeToTank;
@@ -583,9 +759,31 @@ function draw() {
         gun.visible = false;
         GameOverText = text("Game Over", 185,250);
         RestartText = text("Press Space To Restart", 70, 300);
+        weakEnemiesGroup.destroyEach();
+        boss.destroy();
 
         if(keyDown("space")){
-            window.location.reload();
+            gameState = 1;
+            coinCount = 0;
+            life = 3;
+            enemySpeed = 3;
+            turnSpeed = 30;
+            playerSpeed = 5;
+            shieldTime = 20;
+            slowDownTime = 5;
+            level = 1;
+            baseFreeze = 20;
+            baseTankModeTime = 60;
+            tankSpeed = 4;
+            speedCost = 20;
+            lifeCost = 50;
+            shieldCost = 30;
+            freezeCost = 10;
+            tankCost = 40;
+            player.visible = true;
+            gun.visible = true
+            enemiesAlive = 1;
+            createEnemies();
         }
     }
 
