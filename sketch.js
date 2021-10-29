@@ -85,7 +85,12 @@ function setup(){
     freezeTime = baseFreeze;
 
     createEnemies();
+    songs();
+}
 
+function songs(){
+    song.loop();
+    song.play();
 }
 
 function createBullets(x,y){
@@ -495,6 +500,7 @@ function draw() {
      if (song.isPlaying()) {
         song.stop();
       } else {
+        song.loop();
         song.play();
       }
     }
@@ -797,10 +803,12 @@ function startTank(){
 function kill(spriteA,spriteB){
     spriteA.destroy();
     spriteB.destroy();
+    enemiesAlive -= 1
 }
 
 function destroyEnemy(spriteA, spriteB){
     spriteB.destroy();
+    enemiesAlive -= 1
 }
 
 function reduceHealth(spriteA, spriteB){
@@ -818,7 +826,6 @@ function dropCoin(spriteA){
     coin.addImage(coinImg);
     coin.scale = 0.4;
     coinsGroup.add(coin);
-    enemiesAlive -= 1
 }
 
 function addCoin(spriteA,spriteB){
