@@ -33,7 +33,7 @@ var isFreezeReady, isInvincibileReady, isTankReady;
 
 let x = 1;
 let y = 1;
-let easing = 1;
+let easing = 0.3;
 
 let gameIconImage;
 let visiblity = 255;
@@ -714,7 +714,6 @@ function startBossFight(){
     bossHasSpawned = true;
     bossHealth = bossMaxHealth;
     enemiesAlive = 0;
-
 }
 
 
