@@ -524,7 +524,7 @@ function UI(){
     helpText4.position(615, 130);
 
     helpText5 = createElement("h3");
-    helpText5.html("4.You can tweak a few setting in the options menu including the controls but remember to type the whole key name. Also if you find the powerupbar annoying you can disable. The text at the bottom of the screen show if a powerup is ready. Enjoy :)");
+    helpText5.html("4.You can tweak a few setting in the options menu including the controls but remember to type the whole key name. Also if you find the powerup bar annoying you can disable it. The text at the bottom of the screen shows if a powerup is ready. Enjoy :)");
     helpText5.position(615, 180);
     //#endregion
 
