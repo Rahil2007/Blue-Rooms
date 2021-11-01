@@ -1361,3 +1361,9 @@ function go(){
     index++
     }
 }
+
+function touchStarted() {
+  if (getAudioContext().state !== 'running') {
+    getAudioContext().resume();
+  }
+}
