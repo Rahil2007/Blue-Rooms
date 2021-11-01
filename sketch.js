@@ -30,10 +30,15 @@ var freezeTime = 0, freezeAll = false, baseFreeze = 20;
 var nextTimeToFreeze = 0, nextTimeToInvincible  = 0, nextTimeToTank = 500;
 var freezeReadyText, invincibileReadyText, tankReadyText;
 var isFreezeReady, isInvincibileReady, isTankReady;
+var fillFreeze = baseFreeze, fillInvincibilty = invincibilityPeriod, fillTank = baseTankModeTime;
+var pauseText, isPaused = false;
 
 let x = 1;
 let y = 1;
 let easing = 0.3;
+
+var x1,x2,x3,x4,x5,x6;
+var y1,y2,y3,y4,y5,y6;
 
 let gameIconImage;
 let visiblity = 255;
@@ -52,6 +57,7 @@ var optionsButton, musicSlider, musicText;
 var controlsText;
 var forwardInput,backInput, leftInput, rightInput,freezeInput,invincibileInput, TankInput;
 var forwardText,backText, leftText, rightText,freezeInpText,invincibileInpText, TankInpText;
+var enableBarsText, enableBarsBox;
 
 //Variables for about/help 
 var helpButton;
@@ -133,65 +139,91 @@ function createTankBullets(x,y){
     bullet.addImage(bulletImg);
     bullet.scale = 0.3;
     bullet.lifetime = 50;
-    bullet.rotation = 90;
-    bullet.setSpeedAndDirection(-10);
+    bullet.rotation = 270;
+    bullet.setSpeedAndDirection(10);
     bulletsGroup.add(bullet);
 }
 
 function createEnemies(){
+    randomX1 = Math.round(random(10,590));
+    randomY1 = Math.round(random(10,590));  
+    randomX2 = Math.round(random(10,590));
+    randomY2 = Math.round(random(10,590));  
+    randomX3 = Math.round(random(10,590));
+    randomY3 = Math.round(random(10,590));  
+    randomX4 = Math.round(random(10,590));
+    randomY4 = Math.round(random(10,590));  
+    randomX5 = Math.round(random(10,590));
+    randomY5 = Math.round(random(10,590));  
+
     if(enemiesAlive === 1){
-        enemy1 = createSprite(100,100,30,30);
+        enemy1 = createSprite(randomX1,randomY1,30,30);
         enemy1.addAnimation("Walk",enemyAnimation);
         enemy1.scale = 0.65;
-
+    
         weakEnemiesGroup.add(enemy1);
+
+        x2 = enemy1.x;
+        y2 = enemy1.y;
     }
 
     if(enemiesAlive === 2){
-        enemy1 = createSprite(100,100,30,30);
+        enemy1 = createSprite(randomX1,randomY1,30,30);
         enemy1.addAnimation("Walk",enemyAnimation);
         enemy1.scale = 0.65;
 
-        enemy2 = createSprite(300,300,30,30);
+        enemy2 = createSprite(randomX2,randomY2,30,30);
         enemy2.addAnimation("Walk",enemyAnimation);
         enemy2.scale = 0.65;
 
         weakEnemiesGroup.add(enemy1);
         weakEnemiesGroup.add(enemy2);
+
+        x2 = enemy1.x;
+        y2 = enemy1.y;
+        x3 = enemy2.x;
+        y3 = enemy2.y;
     }
 
     if(enemiesAlive === 3){
-        enemy1 = createSprite(100,100,30,30);
+        enemy1 = createSprite(randomX1,randomY1,30,30);
         enemy1.addAnimation("Walk",enemyAnimation);
         enemy1.scale = 0.65;
 
-        enemy2 = createSprite(300,300,30,30);
+        enemy2 = createSprite(randomX2,randomY2,30,30);
         enemy2.addAnimation("Walk",enemyAnimation);
         enemy2.scale = 0.65;
 
-        enemy3 = createSprite(200,200,30,30);
+        enemy3 = createSprite(randomX3,randomY3,30,30);
         enemy3.addAnimation("Walk",enemyAnimation);
         enemy3.scale = 0.65;
 
         weakEnemiesGroup.add(enemy1);
         weakEnemiesGroup.add(enemy2);
         weakEnemiesGroup.add(enemy3);
+
+        x2 = enemy1.x;
+        y2 = enemy1.y;
+        x3 = enemy2.x;
+        y3 = enemy2.y;
+        x4 = enemy3.x;
+        y4 = enemy3.y;
     }
 
     if(enemiesAlive === 4){
-        enemy1 = createSprite(100,100,30,30);
+        enemy1 = createSprite(randomX1,randomY1,30,30);
         enemy1.addAnimation("Walk",enemyAnimation);
         enemy1.scale = 0.65;
 
-        enemy2 = createSprite(300,300,30,30);
+        enemy2 = createSprite(randomX2,randomY2,30,30);
         enemy2.addAnimation("Walk",enemyAnimation);
         enemy2.scale = 0.65;
 
-        enemy3 = createSprite(200,200,30,30);
+        enemy3 = createSprite(randomX3,randomY3,30,30);
         enemy3.addAnimation("Walk",enemyAnimation);
         enemy3.scale = 0.65;
 
-        enemy4 = createSprite(150,200,30,30);
+        enemy4 = createSprite(randomX4,randomY4,30,30);
         enemy4.addAnimation("Walk",enemyAnimation);
         enemy4.scale = 0.65;
         
@@ -199,26 +231,35 @@ function createEnemies(){
         weakEnemiesGroup.add(enemy2);
         weakEnemiesGroup.add(enemy3);
         weakEnemiesGroup.add(enemy4);
+
+        x2 = enemy1.x;
+        y2 = enemy1.y;
+        x3 = enemy2.x;
+        y3 = enemy2.y;
+        x4 = enemy3.x;
+        y4 = enemy3.y;
+        x5 = enemy4.x;
+        y5 = enemy4.y;
     }
 
     if(enemiesAlive === 5){
-        enemy1 = createSprite(100,100,30,30);
+        enemy1 = createSprite(randomX1,randomY1,30,30);
         enemy1.addAnimation("Walk",enemyAnimation);
         enemy1.scale = 0.65;
 
-        enemy2 = createSprite(300,300,30,30);
+        enemy2 = createSprite(randomX2,randomY2,30,30);
         enemy2.addAnimation("Walk",enemyAnimation);
         enemy2.scale = 0.65;
 
-        enemy3 = createSprite(200,200,30,30);
+        enemy3 = createSprite(randomX3,randomY3,30,30);
         enemy3.addAnimation("Walk",enemyAnimation);
         enemy3.scale = 0.65;
 
-        enemy4 = createSprite(150,20,30,30);
+        enemy4 = createSprite(randomX4,randomY4,30,30);
         enemy4.addAnimation("Walk",enemyAnimation);
         enemy4.scale = 0.65;
 
-        enemy5 = createSprite(300,500,30,30);
+        enemy5 = createSprite(randomX5,randomY5,30,30);
         enemy5.addAnimation("Walk",enemyAnimation);
         enemy5.scale = 0.65;
 
@@ -227,6 +268,18 @@ function createEnemies(){
         weakEnemiesGroup.add(enemy3);
         weakEnemiesGroup.add(enemy4);
         weakEnemiesGroup.add(enemy5);
+
+        
+        x2 = enemy1.x;
+        y2 = enemy1.y;
+        x3 = enemy2.x;
+        y3 = enemy2.y;
+        x4 = enemy3.x;
+        y4 = enemy3.y;
+        x5 = enemy4.x;
+        y5 = enemy4.y;
+        x6 = enemy5.x;
+        y6 = enemy5.y;
     }
 }
 
@@ -285,10 +338,9 @@ function upgradeFreezeTime(){
 function upgradeTankTime(){
     if(coinCount >= tankCost && baseTankModeTime < 180){
         baseTankModeTime += 20;
-        nextTimeToTank -= 20;
-        tankSpeed += 1;
+        tankSpeed += 0.5;
         coinCount -= tankCost;
-        tankCost += 15
+        tankCost += 25;
         tankCostText.html(tankCost + " Coins");
     }
 
@@ -310,69 +362,77 @@ function UI(){
 
     //Input
     forwardInput = createInput("W");
-    forwardInput.position(700,100)
+    forwardInput.position(700,130)
     forwardInput.size(20)
 
     leftInput = createInput("A");
-    leftInput.position(700,130)
+    leftInput.position(700,160)
     leftInput.size(20)
 
     backwardInput = createInput("S");
-    backwardInput.position(700,160)
+    backwardInput.position(700,190)
     backwardInput.size(20)
 
     rightInput = createInput("D");
-    rightInput.position(700,190)
+    rightInput.position(700,220)
     rightInput.size(20)
 
     invincibileInput = createInput("E");
-    invincibileInput.position(700,220)
+    invincibileInput.position(700,250)
     invincibileInput.size(20)
 
     freezeInput = createInput("F");
-    freezeInput.position(700,250)
+    freezeInput.position(700,280)
     freezeInput.size(20)
   
     TankInput = createInput("T");
-    TankInput.position(700,280)
+    TankInput.position(700,310)
     TankInput.size(20)
+
+    //Check Box
+    enableBarsBox = createCheckbox('', true);
+    enableBarsBox.position(710, 70);
 
     //Text
     musicText = createElement("h4");
     musicText.html("Music");
     musicText.position(610,20);
 
+    enableBarsText = createElement("h4");
+    enableBarsText.html("Powerup Bars ")
+    enableBarsText.position(610,50)
+
     controlsText = createElement("h3");
     controlsText.html("Controls");
-    controlsText.position(610,50)
+    controlsText.position(610,80)
 
     forwardText = createElement("h4");
     forwardText.html("Forward")
-    forwardText.position(610,80);
+    forwardText.position(610,110);
 
     leftText = createElement("h4");
     leftText.html("Left")
-    leftText.position(610,110);
+    leftText.position(610,140);
 
     backwardText = createElement("h4");
     backwardText.html("Backward")
-    backwardText.position(610,140);
+    backwardText.position(610,170);
 
     rightText = createElement("h4");
     rightText.html("Right")
-    rightText.position(610,170);
+    rightText.position(610,200);
 
     invincibileInpText = createElement("h4");
     invincibileInpText.html("Invincibility")
-    invincibileInpText.position(610,200);
+    invincibileInpText.position(610,230);
 
     freezeInpText = createElement("h4");
     freezeInpText.html("Freeze")
-    freezeInpText.position(610,230);
+    freezeInpText.position(610,260);
     
     TankInpText = createElement("h4");
     TankInpText.html("Tank")
-    TankInpText.position(610,260);
+    TankInpText.position(610,290);
     //#endregion
 
     //All the UI for shop system
@@ -464,7 +524,7 @@ function UI(){
     helpText4.position(615, 130);
 
     helpText5 = createElement("h3");
-    helpText5.html("4.You can tweak a few setting in the options menu including the controls but for remember to type the whole key name. Enjoy :)");
+    helpText5.html("4.You can tweak a few setting in the options menu including the controls but remember to type the whole key name. Also if you find the powerupbar annoying you can disable. The text at the bottom of the screen show if a powerup is ready. Enjoy :)");
     helpText5.position(615, 180);
     //#endregion
 
@@ -518,6 +578,9 @@ function UI(){
 
     TankInput.hide();
     TankInpText.hide()
+
+    enableBarsBox.hide();
+    enableBarsText.hide();
 
     helpText1.hide();
     helpText2.hide();
@@ -575,6 +638,11 @@ function openOptions(){
     
     musicSlider.show();
     musicText.show();
+
+    enableBarsBox.show();
+    enableBarsText.show();
+
+    enableBarsBox.changed(disablePowerupBars)
 }
 
 function openHelp(){
@@ -675,6 +743,9 @@ function closeUI(){
     TankInput.hide();
     TankInpText.hide();
 
+    enableBarsBox.hide();
+    enableBarsText.hide();
+
     helpText1.hide();
     helpText2.hide();
     helpText3.hide();
@@ -716,8 +787,41 @@ function startBossFight(){
     enemiesAlive = 0;
 }
 
+function disablePowerupBars(){
+     if(enableBarsBox.checked()){
+        stroke(0);
+        strokeWeight(4);
+        noFill();
+        rect(450, 380, 20, 150);
+
+        noStroke();
+        fill(0, 255, 255);
+        rect(451, 530, 18, map(fillFreeze, 0, 150 , 0, -150));
+
+        stroke(0);
+        strokeWeight(4);
+        noFill();
+        rect(490, 380, 20, 150);
+
+        noStroke();
+        fill(141, 255, 0);
+        rect(491, 530, 18, map(fillInvincibilty, 0, 200, 0, -150));
+
+        stroke(0);
+        strokeWeight(4);
+        noFill();
+        rect(530, 380, 20, 150);
+
+        noStroke();
+        fill(196, 164, 132);
+        rect(531, 530, 18, map(fillTank, 0, 500, 0, -150));
+    }
+}
 
 function draw() {
+    x1 = player.position.x;
+    y1 = player.position.y;
+
     background("#1a66ff");
 
     let targetX = winMouseX;
@@ -727,156 +831,170 @@ function draw() {
     let targetY = winMouseY;
     let dy = targetY - y;
     y += dy * easing;
-  
+
 
     song.forEach(sound => {
         sound.onended(go)
         sound.setVolume(musicSlider.value());
     });
 
-        if(frameCount % 1 === 0){
-            redrawUI();
+    if(frameCount % 1 === 0){
+        redrawUI();
+    }
+
+    if(nextTimeToFreeze === 0){
+        isFreezeReady = "Ready";
+        fillFreeze = 150
+    }
+    else{
+        isFreezeReady = "Not Ready";
+        fillFreeze += 0.5;
+    }
+
+    if(nextTimeToInvincible === 0){
+        isInvincibileReady = "Ready";
+        fillInvincibilty = 200
+    }
+    else{
+        isInvincibileReady = "Not Ready";
+        fillInvincibilty += 0.5
+    }
+
+    if(spawnTankTime === 0){
+        isTankReady = "Ready";
+        fillTank = 500;
+    }
+    else{
+        isTankReady = "Not Ready";
+        fillTank += 0.5
+    }
+
+    if(spawnTankTime > 0){
+        spawnTankTime -= 1;
+    }
+
+    if(nextTimeToFreeze > 0){
+        nextTimeToFreeze -= 0.5;
+    }
+
+    if(nextTimeToInvincible > 0){
+        nextTimeToInvincible -= 0.5;
+    }
+
+    if(invincibilityPeriod > 0){
+        invincibilityPeriod -= 0.5;
+        player.addImage(playerInvincibleImg);
+        resetColor =  invincibilityPeriod;
+    }
+
+    if(freezeTime > 0){
+        freezeTime -= 0.5;
+        freezeAll = true;
+    }
+
+    if(freezeTime === 0){
+        freezeAll =  false;
+    }
+
+    disablePowerupBars();
+
+    textSize(32);
+    fill("white")
+    score = text("Coins:- " + coinCount, 15,540);
+    levelText = text("Level:- " + level, 17,580);
+    livesText = text("Lives:- " + life, 440, 580);
+    textSize(40);
+
+
+
+    gun.pointTo(x, y);
+    gun.position = player.position;
+
+    if(shootTimer > 0){
+        shootTimer -= 1;
+    }
+
+    if(gameState === 1){
+
+        if(enemiesAlive === 0 && bossHasSpawned === false){
+            level += 1
+            nextLevel();
+            console.log(level);
         }
 
-        if(nextTimeToFreeze === 0){
-            isFreezeReady = "Ready";
-        }
-        else{
-            isFreezeReady = "Not Ready";
-        }
-
-        if(nextTimeToInvincible === 0){
-            isInvincibileReady = "Ready";
-        }
-        else{
-            isInvincibileReady = "Not Ready";
-        }
-
-        if(spawnTankTime === 0){
-            isTankReady = "Ready";
-        }
-        else{
-            isTankReady = "Not Ready";
-        }
-
-        if(spawnTankTime > 0){
-            spawnTankTime -= 1;
-        }
-
-        if(nextTimeToFreeze > 0){
-            nextTimeToFreeze -= 0.5;
-        }
-
-        if(nextTimeToInvincible > 0){
-            nextTimeToInvincible -= 0.5;
+        if(tankMode === false){
+            if(keyDown(leftInput.value())){
+                player.x -= playerSpeed;
+            }
+            if(keyDown(rightInput.value())){
+                player.x += playerSpeed;
+            }
+            if(keyDown(forwardInput.value())){
+                player.y -= playerSpeed;
+            }
+            if(keyDown(backwardInput.value())){
+                player.y += playerSpeed;
+            }
+            if(mouseWentDown("leftButton") && shootTimer === 0){
+                shootTimer = 10;
+                createBullets(gun.x,gun.y);
+            }
+            
+            if(keyWentDown(invincibileInput.value()) && nextTimeToInvincible <= 0){
+                fillInvincibilty = 0
+                invincibilityPeriod = shieldTime;
+                nextTimeToInvincible = 200;
+            }
+            if(keyWentDown(freezeInput.value()) && nextTimeToFreeze <= 0 ){
+                fillFreeze = 0
+                freezeTime = baseFreeze;
+                nextTimeToFreeze =150;
+            }
         }
 
-        if(invincibilityPeriod > 0){
-            invincibilityPeriod -= 0.5;
-            player.addImage(playerInvincibleImg);
-            resetColor =  invincibilityPeriod;
+        if(spawnTankTime === 0 && keyWentDown(TankInput.value()) && tankMode === false){
+            startTank();
+            tankMode = true;
+            spawnTankTime === nextTimeToTank;
+            tankModeTime = baseTankModeTime;
+            player.position.x = 10000
         }
 
-        if(freezeTime > 0){
-            freezeTime -= 0.5;
-            freezeAll = true;
-        }
-
-        if(freezeTime === 0){
-            freezeAll =  false;
-        }
-
-        textSize(32);
-        fill("white")
-        score = text("Coins:- " + coinCount, 15,40);
-        levelText = text("Level:- " + level, 440,40);
-        livesText = text("Lives:- " + life, 17, 80);
-        textSize(40);
-
-        gun.pointTo(x, y);
-        gun.position = player.position;
-
-        if(shootTimer > 0){
-            shootTimer -= 1;
-        }
-
-        if(gameState === 1){
-            if(enemiesAlive === 0 && bossHasSpawned === false){
-                level += 1
-                nextLevel();
-                console.log(level);
+        if(tankMode === true){
+            
+            if(keyDown("a")){
+                tank.x -= tankSpeed;
             }
 
-            if(tankMode === false){
-                if(keyDown(leftInput.value())){
-                    player.x -= playerSpeed;
-                }
-                if(keyDown(rightInput.value())){
-                    player.x += playerSpeed;
-                }
-                if(keyDown(forwardInput.value())){
-                    player.y -= playerSpeed;
-                }
-                if(keyDown(backwardInput.value())){
-                    player.y += playerSpeed;
-                }
-                if(mouseWentDown("leftButton") && shootTimer === 0){
-                    shootTimer = 10;
-                    createBullets(gun.x,gun.y);
-                }
-                
-                if(keyWentDown(invincibileInput.value()) && nextTimeToInvincible <= 0){
-                    invincibilityPeriod = shieldTime;
-                    nextTimeToInvincible = invincibilityPeriod + 70;
-                }
-                if(keyWentDown(freezeInput.value()) && nextTimeToFreeze <= 0 ){
-                    freezeTime = baseFreeze;
-                    nextTimeToFreeze = freezeTime + 50;
-                }
+            if(keyDown("d")){
+                tank.x += tankSpeed;
             }
 
-            if(spawnTankTime === 0 && keyWentDown(TankInput.value()) && tankMode === false){
-                startTank();
-                tankMode = true;
-                spawnTankTime === nextTimeToTank;
-                tankModeTime = baseTankModeTime;
-                player.position.x = 10000
+            if(mouseWentDown("leftButton")){
+            createTankBullets(tank.x,tank.y-40)
+            }
+            
+            tank.bounceOff(edge1);
+            tank.bounceOff(edge2);
+            tank.bounceOff(edge3);
+            tank.bounceOff(edge4);
+
+            tank.overlap(weakEnemiesGroup,destroyEnemy)
+
+            
+            if(tankModeTime > 0){
+                tankModeTime -= 1;
             }
 
-            if(tankMode === true){
-                
-                if(keyDown("a")){
-                    tank.x -= tankSpeed;
-                }
-
-                if(keyDown("d")){
-                    tank.x += tankSpeed;
-                }
-
-                if(mouseWentDown("leftButton")){
-                createTankBullets(tank.x,tank.y-40)
-                }
-                
-                tank.bounceOff(edge1);
-                tank.bounceOff(edge2);
-                tank.bounceOff(edge3);
-                tank.bounceOff(edge4);
-
-                tank.overlap(weakEnemiesGroup,destroyEnemy)
-
-                
-                if(tankModeTime > 0){
-                    tankModeTime -= 1;
-                }
-
-                if(tankModeTime <= 0){
-                    spawnTankTime = nextTimeToTank;
-                    tankMode = false;
-                    player.position.x = 300;
-                    player.position.y = 500;
-                    tank.destroy();
-                }
+            if(tankModeTime <= 0){
+                fillTank = 0;
+                spawnTankTime = 500;
+                tankMode = false;
+                player.position.x = 300;
+                player.position.y = 500;
+                tank.destroy();
             }
+        }
 
 
         }else if(gameState === 2){
@@ -936,16 +1054,16 @@ function draw() {
 
         if(bossHasSpawned === true){
             if(gameState === 1){
-                bossName = text("Kevin", 260, 550)
+                bossName = text("Kevin", 260, 45)
             
                 stroke(0);
                 strokeWeight(4);
                 noFill();
-                rect(100, 560, 400, 20);
+                rect(100, 55, 400, 20);
             
                 noStroke();
                 fill(255, 0, 0);
-                rect(100, 561, map(bossHealth, 0, bossMaxHealth, 0, 400), 18);
+                rect(100, 56, map(bossHealth, 0, bossMaxHealth, 0, 400), 18);
             }
 
             if(boss.x > 595){
@@ -967,7 +1085,7 @@ function draw() {
                 resetColor = 50;
                 player.x = 200;
                 player.y = 200;
-                invincibilityPeriod = 20;
+                invincibilityPeriod = 30;
                 nextTimeToInvincible = 0;
                 lifeCostText.html(lifeCost + " Coins")
             }
@@ -991,7 +1109,9 @@ function draw() {
         }
 
         if(freezeAll === false){
-            if(enemiesSpawned >= 1){
+            //Old Enemy Movement
+            //#region 
+            /*if(enemiesSpawned >= 1){
                 if(randomDir1 === 1){
                     enemy1.x -= enemySpeed;
                     } else if(randomDir1 === 2){
@@ -1067,6 +1187,54 @@ function draw() {
                         }    
                     }
                 }
+            }*/
+            //#endregion
+            
+            //New Movement
+            var m1 = createVector(x2 - x1, y2 - y1);
+            var m2 = createVector(x3 - x1, y3 - y1);
+            var m3 = createVector(x4 - x1, y4 - y1);
+            var m4 = createVector(x5 - x1, y5 - y1);
+            var m5 = createVector(x6 - x1, y6 - y1);
+    
+            //This sets the magnitude so that it moves in a constant rate but in the right direction.
+            m1.normalize();
+            m2.normalize();
+            m3.normalize();
+            m4.normalize();
+            m5.normalize();
+    
+            //Set d equal to the speed
+            x2 -= m1.x * enemySpeed;
+            y2 -= m1.y * enemySpeed;
+            x3 -= m2.x * enemySpeed;
+            y3 -= m2.y * enemySpeed;
+            x4 -= m3.x * enemySpeed;
+            y4 -= m3.y * enemySpeed;
+            x5 -= m4.x * enemySpeed;
+            y5 -= m4.y * enemySpeed;
+            x6 -= m5.x * enemySpeed;
+            y6 -= m5.y * enemySpeed;
+    
+            if(enemiesSpawned >= 1){
+                enemy1.position.x = x2;
+                enemy1.position.y = y2;
+                if(enemiesSpawned >= 2){
+                    enemy2.position.x = x3;
+                    enemy2.position.y = y3;
+                    if(enemiesSpawned >=3){
+                        enemy3.position.x = x4;
+                        enemy3.position.y = y4;
+                        if(enemiesSpawned >= 4){
+                            enemy4.position.x = x5;
+                            enemy4.position.y = y5;
+                            if(enemiesSpawned >= 5){
+                                enemy5.position.x = x6;
+                                enemy5.position.y = y6;
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -1109,9 +1277,9 @@ function draw() {
         //console.log(enemiesAlive)
         drawSprites();
      
-    tint(255, visiblity);
-    image(gameIconImage, 0, 0, 600,600)
-    visiblity -= 3  
+        tint(255, visiblity);
+        image(gameIconImage, 0, 0, 600,600)
+        visiblity -= 3  
 }
 
 
@@ -1158,8 +1326,6 @@ function addCoin(spriteA,spriteB){
 
 function nextLevel(){
     enemiesAlive = Math.round(random(2,5));
-    nextTimeToInvincible = 0;
-    nextTimeToFreeze = 0;
 
     if(level % 3 === 0 && enemySpeed > 8){
         enemySpeed += 1;
